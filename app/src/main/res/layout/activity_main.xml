@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Mark de Reeper
+  ~
+  ~  Permission is hereby granted, free of charge, to any person
+  ~  obtaining a copy of this software and associated documentation
+  ~  files (the "Software"), to deal in the Software without
+  ~  restriction, including without limitation the rights to use,
+  ~  copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~  copies of the Software, and to permit persons to whom the
+  ~  Software is furnished to do so, subject to the following
+  ~  conditions:
+  ~
+  ~  The above copyright notice and this permission notice shall be
+  ~  included in all copies or substantial portions of the Software.
+  ~
+  ~  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  ~  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  ~  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  ~  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  ~  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  ~  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  ~  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  ~  OTHER DEALINGS IN THE SOFTWARE.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tableLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/ipLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:labelFor="@+id/ipAddress"
+        android:text="@string/dmd_ip"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ipAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="16dp"
+        android:duplicateParentState="false"
+        android:text="@string/wifi_ip_unknown"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/ipLabel"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/portLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="20dp"
+        android:labelFor="@+id/portInput"
+        android:text="@string/dmd_port"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ipLabel" />
+
+    <EditText
+        android:id="@+id/portInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="8dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:hint="@string/dmd_port_hint"
+        android:inputType="numberDecimal"
+        android:text="@string/default_dmd_port"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/portLabel"
+        app:layout_constraintTop_toBottomOf="@+id/ipAddress" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="32dp"
+        android:onClick="startDMDViewer"
+        android:text="@string/connect_dmd"
+        app:layout_constraintStart_toEndOf="@+id/enableLedEffect"
+        app:layout_constraintTop_toBottomOf="@+id/portInput" />
+
+    <CheckBox
+        android:id="@+id/enableLedEffect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:checked="true"
+        android:text="@string/led_matrix"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="391dp" />
+
+    <TextView
+        android:id="@+id/wsUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginTop="8dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/portInput" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/ws_url_text"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/portLabel" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
