@@ -26,7 +26,8 @@
 package nz.dereeper.dmdviewer;
 
 import android.graphics.Color;
-import android.util.Log;
+
+import timber.log.Timber;
 
 import static androidx.core.graphics.ColorUtils.HSLToColor;
 
@@ -35,8 +36,6 @@ import static androidx.core.graphics.ColorUtils.HSLToColor;
  * Borrowed heavily from the code/algorithms in https://github.com/freezy/dmd-extensions
  */
 class ImageUtils {
-
-    private static final String TAG = "ImageUtils";
 
     private ImageUtils() {
         // Just statics
@@ -61,7 +60,7 @@ class ImageUtils {
             }
             return rawImage;
         } else {
-            Log.e(TAG, "Planes length not a multiple of 3 in RGB24:" + colours.length);
+            Timber.e("Planes length not a multiple of 3 in RGB24: %s", colours.length);
             return null;
         }
     }
@@ -84,8 +83,8 @@ class ImageUtils {
             }
             return rawImage;
         }
-        Log.w(TAG, "Planes data was not valid, bitLength:" + bitLength + ", planes:" +
-                planes.length + ", area:" + metadata.getDimensions().area);
+        Timber.w("Planes data was not valid, bitLength: %s, planes length: %s, area: %s",
+                bitLength, planes.length, metadata.getDimensions().area);
         return null;
     }
 
@@ -109,8 +108,8 @@ class ImageUtils {
             }
             return rawImage;
         }
-        Log.w(TAG, "Planes data was not valid, bitLength:" + bitLength + ", planes:" +
-                planes.length + ", area:" + metadata.getDimensions().area);
+        Timber.w("Planes data was not valid, bitLength: %s, planes length: %s, area: %s",
+                bitLength, planes.length, metadata.getDimensions().area);
         return null;
     }
 
@@ -150,7 +149,7 @@ class ImageUtils {
                 rawImage[y * extraWidth + x] = colour;
             }
         } else {
-            Log.v(TAG, "Skipping black pixel");
+            Timber.v("Skipping black pixel");
         }
     }
 

@@ -25,19 +25,18 @@
 
 package nz.dereeper.dmdviewer;
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+
+import timber.log.Timber;
 
 import static nz.dereeper.dmdviewer.Frame.FrameType.INVALID;
 import static nz.dereeper.dmdviewer.Frame.FrameType.UNKNOWN;
 import static nz.dereeper.dmdviewer.Frame.FrameType.getEnum;
 
 class Frame {
-
-    private static final String TAG = "Frame";
 
     private FrameType frameType;
     private byte[] planes;
@@ -75,7 +74,7 @@ class Frame {
                     return frameType;
                 }
             }
-            Log.w(TAG, "Unknown frame type:" + type);
+            Timber.w("Unknown frame type: %s", type);
             return UNKNOWN;
         }
 
@@ -170,8 +169,8 @@ class Frame {
                     break;
             }
         } catch (BufferUnderflowException e) {
-            Log.e(TAG, "Remaining frameData:" + remainingFrameData +
-                    "(bytes) was less than expected for type: " + getFrameType(), e);
+            Timber.e(e, "Remaining frameData: %s(bytes) was less than expected for type: %s",
+                    remainingFrameData, getFrameType());
             frameType = INVALID;
         }
     }

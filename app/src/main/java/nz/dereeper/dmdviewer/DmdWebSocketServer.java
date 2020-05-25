@@ -25,8 +25,6 @@
 
 package nz.dereeper.dmdviewer;
 
-import android.util.Log;
-
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -34,11 +32,12 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+import timber.log.Timber;
+
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 public class DmdWebSocketServer extends WebSocketServer {
 
-    private static final String TAG = "DMD_WS";
     private final Processing processing;
 
     DmdWebSocketServer(final Processing processing, final int port) {
@@ -48,34 +47,34 @@ public class DmdWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(final WebSocket webSocket, final ByteBuffer message) {
-        Log.v(TAG, "Binary message received from client");
+        Timber.v("Binary message received from client");
         processing.processFrame(new Frame(message.order(LITTLE_ENDIAN)));
     }
 
     @Override
     public void onMessage(final WebSocket webSocket, final String message) {
-        Log.d(TAG, "Text message: " + message + " received from client");
+        Timber.d("Text message: %s received from client", message);
     }
 
     @Override
     public void onOpen(final WebSocket webSocket, final ClientHandshake clientHandshake) {
-        Log.i(TAG, "A new client connected");
+        Timber.i("A new client connected");
 
     }
 
     @Override
     public void onClose(final WebSocket webSocket, final int i, final String s, final boolean b) {
-        Log.i(TAG, "A client disconnected");
+        Timber.i("A client disconnected");
     }
 
     @Override
     public void onError(final WebSocket webSocket, final Exception e) {
-        Log.e(TAG, "Exception triggered during WebSocket processing", e);
+        Timber.e(e, "Exception triggered during WebSocket processing");
         processing.closeDown(e.getMessage());
     }
 
     @Override
     public void onStart() {
-        Log.i(TAG, "Starting the WS Server on port:" + getAddress().getPort());
+        Timber.i("Starting the WS Server on port: %s", getAddress().getPort());
     }
 }

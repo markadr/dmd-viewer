@@ -27,7 +27,6 @@ package nz.dereeper.dmdviewer;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -41,9 +40,12 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import timber.log.Timber;
+
 import static android.graphics.Bitmap.createBitmap;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 import static androidx.core.graphics.ColorUtils.colorToHSL;
+import static java.lang.Integer.toHexString;
 import static nz.dereeper.dmdviewer.Frame.FrameType.COLORED_GRAY_2;
 import static nz.dereeper.dmdviewer.Frame.FrameType.GRAY_2_PLANES;
 import static nz.dereeper.dmdviewer.ImageUtils.toRawImage;
@@ -54,7 +56,6 @@ import static nz.dereeper.dmdviewer.MainActivity.DMD_LED_ENABLED;
 
 public class DmdActivity extends AppCompatActivity implements Processing, Metadata {
 
-    private static final String TAG = "DMD";
     private static final int DEFAULT_COLOUR = 0xec843d;
     private static final int viewUISettings = View.SYSTEM_UI_FLAG_LOW_PROFILE |
                                               View.SYSTEM_UI_FLAG_FULLSCREEN |
@@ -92,7 +93,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
 
     @Override
     public void closeDown(final String errorMessage) {
-        Log.i(TAG, "Closing DmdActivity...");
+        Timber.i("Closing DmdActivity...");
         getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
         stopServer();
         if (errorMessage != null) {
@@ -116,7 +117,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
             case GRAY_4_PLANES:
             case RGB24:
                 if (isNewFrame(frame)) {
-                    Log.v(TAG, frame.getFrameType() + ", timestamp:" + frame.getTimeStamp());
+                    Timber.v("%s, timestamp:%s", frame.getFrameType(), frame.getTimeStamp());
                     if (renderFrame(frame)) {
                         // If this frame resulted in an image being generated,
                         // keep track of the previous frame so it can be compared against
@@ -124,34 +125,34 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
                         previousFrame = frame;
                     }
                 } else {
-                    Log.v(TAG, "Skipping duplicate frame of type: " + frame.getFrameType());
+                    Timber.v("Skipping duplicate frame of type: %s", frame.getFrameType());
                 }
                 break;
             case COLOUR:
-                Log.i(TAG, "Colour frame: " + frame.getColour());
+                Timber.i("Colour frame: 0x%s", toHexString(frame.getColour()));
                 setColour(frame.getColour());
                 break;
             case PALETTE:
                 palette = frame.getPalette();
-                Log.i(TAG, "Palette frame of length: " + palette.length);
+                Timber.i("Palette frame of length: %s", palette.length);
                 break;
             case DIMENSIONS:
                 setDimensions(frame.getDimensions());
                 break;
             case CLEAR_COLOUR:
-                Log.i(TAG, "Clear colour frame");
+                Timber.i("Clear colour frame");
                 setColour(DEFAULT_COLOUR);
                 break;
             case CLEAR_PALETTE:
-                Log.i(TAG, "Clear palette frame");
+                Timber.i("Clear palette frame");
                 palette = null;
                 break;
             case GAME_NAME:
                 gameName = frame.getGameName();
-                Log.i(TAG, "Game name frame: " + gameName);
+                Timber.i("Game name frame: %s", gameName);
                 break;
             case UNKNOWN:
-                Log.i(TAG, "Binary message received is unknown type");
+                Timber.i("Binary message received is unknown type");
         }
     }
 
@@ -165,7 +166,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
         // TODO: make the params of the LedMatrix configurable via UI
         //  A 2x2 with a 1 pixel margin good to start with.
         ledMatrix = new LedMatrix(2, 2, 1, getIntent().getBooleanExtra(DMD_LED_ENABLED, true));
-        Log.i(TAG, "LED Matrix: " + ledMatrix);
+        Timber.i("LED Matrix: %s", ledMatrix);
         openingFrame = createOpeningFrame();
     }
 
@@ -223,11 +224,11 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     private void stopServer() {
         if (webSocketServer != null) {
             try {
-                Log.i(TAG, "Stopping the WS Server");
+                Timber.i("Stopping the WS Server");
                 // Give it some time to clean up on stopping.
                 webSocketServer.stop(500);
             } catch (InterruptedException e) {
-                Log.e(TAG, "We had an exception when trying to stop the WS Server", e);
+                Timber.e(e, "We had an exception when trying to stop the WS Server");
             }
             webSocketServer = null;
         }
@@ -252,7 +253,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
         }
         dmdImage = createBitmap(dmdImageWidth, dmdImageHeight, Bitmap.Config.ARGB_8888);
         dmdImage.setHasAlpha(false);
-        Log.i(TAG, "Dimensions frame: " + dimensions);
+        Timber.i("Dimensions frame: %s", dimensions);
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             runOnUiThread(new Runnable() {
@@ -338,7 +339,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
             frameStream.readFully(openingFrameBytes);
             return new Frame(openingFrameBytes);
         } catch (IOException e) {
-            Log.w(TAG, "There was an issue creating the opening frame", e);
+            Timber.w(e, "There was an issue creating the opening frame");
         } finally {
             if (frameStream != null) {
                 try {

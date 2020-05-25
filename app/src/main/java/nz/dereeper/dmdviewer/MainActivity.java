@@ -37,7 +37,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,6 +44,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import timber.log.Timber;
 
 import static android.Manifest.permission.ACCESS_WIFI_STATE;
 import static android.Manifest.permission.INTERNET;
@@ -56,8 +57,6 @@ import static java.lang.Integer.parseInt;
 
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "Main";
 
     static final String DMD_WS_PORT = "WS_PORT";
     static final String DMD_LED_ENABLED = "LED_ENABLED";
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, DmdActivity.class);
         intent.putExtra(DMD_WS_PORT, port);
         intent.putExtra(DMD_LED_ENABLED, enabled);
-        Log.i(TAG, "Opening DMD screen, passing port: " + port + " enable LED effect:" + enabled);
+        Timber.i("Opening DMD screen, passing port: %s enable LED effect: %s", port, enabled);
         startActivity(intent);
     }
 
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "Closing MainActivity...");
+        Timber.i("Closing MainActivity...");
     }
 
     private void showAboutDialog() {
