@@ -44,4 +44,21 @@ public class Dimensions {
     public String toString() {
         return width + "x" + height;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof Dimensions) {
+            Dimensions d = (Dimensions)other;
+            return width == d.width && height == d.height;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return width + height;
+    }
 }

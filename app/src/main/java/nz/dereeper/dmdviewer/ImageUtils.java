@@ -70,38 +70,57 @@ class ImageUtils {
                             final int[] palette,
                             final int bitLength,
                             final Metadata metadata) {
-        final int width = metadata.getDimensions().width;
-        final int height = metadata.getDimensions().height;
-        // Calculate this now rather than every time we want to set a pixel when LED enabled.
-        final int extraWidth = extraWidthCalc(metadata);
-        final int[] rawImage = createRawImage(metadata);
-        final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                setPixel(rawImage, x, y, palette[plane[y * width + x]], metadata, extraWidth);
+        if (planesAreValid(planes, bitLength, metadata.getDimensions())) {
+            final int width = metadata.getDimensions().width;
+            final int height = metadata.getDimensions().height;
+            // Calculate this now rather than every time we want to set a pixel when LED enabled.
+            final int extraWidth = extraWidthCalc(metadata);
+            final int[] rawImage = createRawImage(metadata);
+            final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    setPixel(rawImage, x, y, palette[plane[y * width + x]], metadata, extraWidth);
+                }
             }
+            return rawImage;
         }
-        return rawImage;
+        Log.w(TAG, "Planes data was not valid, bitLength:" + bitLength + ", planes:" +
+                planes.length + ", area:" + metadata.getDimensions().area);
+        return null;
     }
 
     static int[] toRawImage(final byte[] planes,
                             final float numberOfColours,
                             final int bitLength,
                             final Metadata metadata) {
-        final int width = metadata.getDimensions().width;
-        final int height = metadata.getDimensions().height;
-        // Calculate this now rather than every time we want to set a pixel when LED enabled.
-        final int extraWidth = extraWidthCalc(metadata);
-        final int[] rawImage = createRawImage(metadata);
-        final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                final float[] newHsl = metadata.getHslCopy();
-                newHsl[2] = newHsl[2] * (plane[y * width + x] / numberOfColours); // Lum value
-                setPixel(rawImage, x, y, HSLToColor(newHsl), metadata, extraWidth);
+        if (planesAreValid(planes, bitLength, metadata.getDimensions())) {
+            final int width = metadata.getDimensions().width;
+            final int height = metadata.getDimensions().height;
+            // Calculate this now rather than every time we want to set a pixel when LED enabled.
+            final int extraWidth = extraWidthCalc(metadata);
+            final int[] rawImage = createRawImage(metadata);
+            final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    final float[] newHsl = metadata.getHslCopy();
+                    newHsl[2] = newHsl[2] * (plane[y * width + x] / numberOfColours); // Lum value
+                    setPixel(rawImage, x, y, HSLToColor(newHsl), metadata, extraWidth);
+                }
             }
+            return rawImage;
         }
-        return rawImage;
+        Log.w(TAG, "Planes data was not valid, bitLength:" + bitLength + ", planes:" +
+                planes.length + ", area:" + metadata.getDimensions().area);
+        return null;
+    }
+
+    private static boolean planesAreValid(final byte[] planes,
+                                          final int bitLength,
+                                          final Dimensions dimensions) {
+        // Sanity check that we have a valid set of planes data compared to expected values
+        return dimensions.area % 8 == 0 &&
+               planes.length % bitLength == 0 &&
+               planes.length / bitLength == dimensions.area / 8;
     }
 
     private static int[] createRawImage(final Metadata metadata) {
@@ -163,9 +182,7 @@ class ImageUtils {
                                      final int bitLength,
                                      final Dimensions dimensions) {
         final byte[] plane = new byte[dimensions.area];
-        final int planeSize = planes.length / bitLength;
         final int bytes = dimensions.area / 8;
-        Log.v(TAG, "bitLength:" + bitLength + ", planes:" + planes.length + ", plain:" + plane.length + ", planeSize:" + planeSize + ", bytes:" + bytes);
         // From my understanding....
         // The frame is made up of a width x height / 8 (number of bits in a byte) items across
         // bitLength number of planes.
@@ -176,7 +193,7 @@ class ImageUtils {
         for (int bytePos = 0; bytePos < bytes; bytePos++) {
             for (int bitPos = 7; bitPos >= 0; bitPos--) {
                 for (int planePos = 0; planePos < bitLength; planePos++) {
-                    final int bit = theBit(planes[planeSize * planePos + bytePos], bitPos);
+                    final int bit = theBit(planes[bytes * planePos + bytePos], bitPos);
                     plane[bytePos * 8 + bitPos] |= (bit << planePos);
                 }
             }

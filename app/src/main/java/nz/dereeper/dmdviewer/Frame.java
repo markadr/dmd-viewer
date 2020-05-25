@@ -28,15 +28,18 @@ package nz.dereeper.dmdviewer;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
+import static nz.dereeper.dmdviewer.Frame.FrameType.INVALID;
+import static nz.dereeper.dmdviewer.Frame.FrameType.UNKNOWN;
 import static nz.dereeper.dmdviewer.Frame.FrameType.getEnum;
 
 class Frame {
 
     private static final String TAG = "Frame";
 
-    private final FrameType frameType;
+    private FrameType frameType;
     private byte[] planes;
     private Dimensions dimensions;
     private String gameName;
@@ -56,7 +59,9 @@ class Frame {
         CLEAR_COLOUR("clearColor"),
         CLEAR_PALETTE("clearPalette"),
         GAME_NAME("gameName"),
-        UNKNOWN("unknown");
+        UNKNOWN("unknown"),
+        // For the case where we have a known type but the data is not as expected.
+        INVALID("invalid");
 
         private final String type;
 
@@ -70,7 +75,7 @@ class Frame {
                     return frameType;
                 }
             }
-            Log.i(TAG, "Unknown frame type:" + type);
+            Log.w(TAG, "Unknown frame type:" + type);
             return UNKNOWN;
         }
 
@@ -86,8 +91,10 @@ class Frame {
      * @param data the binary message from dmdext.
      */
     Frame(ByteBuffer data) {
-        this.frameType = getEnum(stringFromData(data, true));
-        deserialize(data);
+        frameType = getEnum(stringFromData(data, true));
+        if (!frameType.equals(UNKNOWN)) {
+            deserialize(data);
+        }
     }
 
     /**
@@ -130,35 +137,42 @@ class Frame {
 
     // Attempt to construct the additional data based on the type of frame we are
     private void deserialize(ByteBuffer frameData) {
-        switch (frameType) {
-            case GAME_NAME:
-                gameName = stringFromData(frameData, false);
-                break;
-            case DIMENSIONS:
-                dimensions = new Dimensions(frameData.getInt(), frameData.getInt());
-                break;
-            case COLORED_GRAY_2:
-            case COLORED_GRAY_4:
-                timeStamp = frameData.getInt();
-                palette = paletteFromData(frameData);
-                // The remainder of the data contains the planes.
-                planes = new byte[frameData.remaining()];
-                frameData.get(planes);
-                break;
-            case RGB24:
-            case GRAY_2_PLANES:
-            case GRAY_4_PLANES:
-                timeStamp = frameData.getInt();
-                // The remainder of the data contains the planes.
-                planes = new byte[frameData.remaining()];
-                frameData.get(planes);
-                break;
-            case COLOUR:
-                colour = frameData.getInt();
-                break;
-            case PALETTE:
-                palette = paletteFromData(frameData);
-                break;
+        final int remainingFrameData = frameData.remaining();
+        try {
+            switch (frameType) {
+                case GAME_NAME:
+                    gameName = stringFromData(frameData, false);
+                    break;
+                case DIMENSIONS:
+                    dimensions = new Dimensions(frameData.getInt(), frameData.getInt());
+                    break;
+                case COLORED_GRAY_2:
+                case COLORED_GRAY_4:
+                    timeStamp = frameData.getInt();
+                    palette = paletteFromData(frameData);
+                    // The remainder of the data contains the planes.
+                    planes = new byte[frameData.remaining()];
+                    frameData.get(planes);
+                    break;
+                case RGB24:
+                case GRAY_2_PLANES:
+                case GRAY_4_PLANES:
+                    timeStamp = frameData.getInt();
+                    // The remainder of the data contains the planes.
+                    planes = new byte[frameData.remaining()];
+                    frameData.get(planes);
+                    break;
+                case COLOUR:
+                    colour = frameData.getInt();
+                    break;
+                case PALETTE:
+                    palette = paletteFromData(frameData);
+                    break;
+            }
+        } catch (BufferUnderflowException e) {
+            Log.e(TAG, "Remaining frameData:" + remainingFrameData +
+                    "(bytes) was less than expected for type: " + getFrameType(), e);
+            frameType = INVALID;
         }
     }
 
@@ -174,9 +188,13 @@ class Frame {
         }
         int length = 0;
         // Look through the data until we find a null (0) byte or we hit the end of the data
-        while (b != 0 && data.hasRemaining()) {
+        while (b != 0) {
             length++;
-            b = data.get();
+            if (data.hasRemaining()) {
+                b = data.get();
+            } else {
+                break;
+            }
         }
         return new String(data.array(), start, length);
     }

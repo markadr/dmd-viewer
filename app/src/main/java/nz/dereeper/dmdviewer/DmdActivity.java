@@ -290,7 +290,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
                     // If we don't have a valid palette to match the required size,
                     // fall-back to HSL colour.
                     if (palette != null && palette.length == expectedPaletteSize) {
-                        rawImage = ImageUtils.toRawImage(frame.getPlanes(), palette, numberOfGrays, this);
+                        rawImage = toRawImage(frame.getPlanes(), palette, numberOfGrays, this);
                     } else {
                         rawImage = toRawImage(frame.getPlanes(), expectedPaletteSize, numberOfGrays, this);
                     }
@@ -298,7 +298,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
                 case COLORED_GRAY_2:
                 case COLORED_GRAY_4:
                     final int numberOfColours = frame.getFrameType().equals(COLORED_GRAY_2) ? 2 : 4;
-                    rawImage = ImageUtils.toRawImage(frame.getPlanes(), frame.getPalette(), numberOfColours, this);
+                    rawImage = toRawImage(frame.getPlanes(), frame.getPalette(), numberOfColours, this);
                     break;
                 case RGB24:
                     rawImage = toRawImageFromRgb24(frame.getPlanes(), this);
