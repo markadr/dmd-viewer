@@ -94,12 +94,12 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     @Override
     public void closeDown(final String errorMessage) {
         Timber.i("Closing DmdActivity...");
-        getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
         stopServer();
         if (errorMessage != null) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    getWindow().clearFlags(FLAG_KEEP_SCREEN_ON);
                     Toast.makeText(getApplicationContext(),
                             "Closing down due to an error: \n" + errorMessage, Toast.LENGTH_SHORT).show();
                 }
@@ -246,10 +246,6 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
         } else {
             dmdImageWidth = dimensions.width;
             dmdImageHeight = dimensions.height;
-        }
-        // If the dimensions change, hint to the system that the old bitmap is no longer needed.
-        if (dmdImage != null) {
-            dmdImage.recycle();
         }
         dmdImage = createBitmap(dmdImageWidth, dmdImageHeight, Bitmap.Config.ARGB_8888);
         dmdImage.setHasAlpha(false);
