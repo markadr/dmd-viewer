@@ -34,6 +34,11 @@ public interface Processing {
     void processFrame(Frame frame);
 
     /**
+     * A client has disconnected.
+     */
+    void clientDisconnected();
+
+    /**
      * Called to indicate things are closing down. Pass an error message if this was the result of
      * an error condition.
      * @param errorMessage the error message if closing was the result of an error condition.

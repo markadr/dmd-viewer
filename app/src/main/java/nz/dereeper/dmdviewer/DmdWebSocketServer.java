@@ -59,12 +59,12 @@ public class DmdWebSocketServer extends WebSocketServer {
     @Override
     public void onOpen(final WebSocket webSocket, final ClientHandshake clientHandshake) {
         Timber.i("A new client connected");
-
     }
 
     @Override
     public void onClose(final WebSocket webSocket, final int i, final String s, final boolean b) {
         Timber.i("A client disconnected");
+        processing.clientDisconnected();
     }
 
     @Override

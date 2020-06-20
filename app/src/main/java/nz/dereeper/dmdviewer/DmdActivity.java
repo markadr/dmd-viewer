@@ -157,6 +157,16 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     }
 
     @Override
+    public void clientDisconnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showOpeningFrame();
+            }
+        });
+    }
+
+    @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dmd);
