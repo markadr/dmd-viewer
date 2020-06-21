@@ -50,8 +50,9 @@ import static nz.dereeper.dmdviewer.Frame.FrameType.COLORED_GRAY_2;
 import static nz.dereeper.dmdviewer.Frame.FrameType.GRAY_2_PLANES;
 import static nz.dereeper.dmdviewer.ImageUtils.toRawImage;
 import static nz.dereeper.dmdviewer.ImageUtils.toRawImageFromRgb24;
+import static nz.dereeper.dmdviewer.MainActivity.DMD_ROUND_PIXEL;
 import static nz.dereeper.dmdviewer.MainActivity.DMD_WS_PORT;
-import static nz.dereeper.dmdviewer.MainActivity.DMD_LED_ENABLED;
+import static nz.dereeper.dmdviewer.MainActivity.DMD_ENABLED;
 
 
 public class DmdActivity extends AppCompatActivity implements Processing, Metadata {
@@ -71,13 +72,13 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     private String gameName;
     private float[] hsl = new float[3];
     private int[] palette;
-    private LedMatrix ledMatrix;
+    private Dmd dmd;
     private Frame previousFrame;
     private Frame openingFrame;
 
     @Override
-    public LedMatrix getLedMatrix() {
-        return ledMatrix;
+    public Dmd getDmd() {
+        return dmd;
     }
 
     @Override
@@ -173,10 +174,9 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
         dmdView = findViewById(R.id.dmdView);
         getWindow().addFlags(FLAG_KEEP_SCREEN_ON);
         setColour(DEFAULT_COLOUR);
-        // TODO: make the params of the LedMatrix configurable via UI
-        //  A 2x2 with a 1 pixel margin good to start with.
-        ledMatrix = new LedMatrix(2, 2, 1, getIntent().getBooleanExtra(DMD_LED_ENABLED, true));
-        Timber.i("LED Matrix: %s", ledMatrix);
+        dmd = new Dmd(getIntent().getBooleanExtra(DMD_ENABLED, true),
+                      getIntent().getBooleanExtra(DMD_ROUND_PIXEL, false));
+        Timber.i("DMD: %s", dmd);
         openingFrame = createOpeningFrame();
     }
 
@@ -250,9 +250,9 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
 
     private void setDimensions(final Dimensions dimensions) {
         this.dimensions = dimensions;
-        if (ledMatrix.enabled) {
-            dmdImageWidth = dimensions.width * ledMatrix.ledWidth;
-            dmdImageHeight = dimensions.height * ledMatrix.ledHeight;
+        if (dmd.isEnabled()) {
+            dmdImageWidth = dimensions.width * dmd.getCombined();
+            dmdImageHeight = dimensions.height * dmd.getCombined();
         } else {
             dmdImageWidth = dimensions.width;
             dmdImageHeight = dimensions.height;

@@ -34,7 +34,8 @@
     <string name="dmd_port">Listen Port</string>
     <string name="dmd_port_hint">The port for the WebSocketServer to listen on</string>
     <string name="internet_needed">Need Internet permission to start DMD viewer</string>
-    <string name="led_matrix">Enable LED Effect</string>
+    <string name="enable_dmd_effect">Enable DMD Effect</string>
+    <string name="dmd_pixel_round">Round DMD Pixel</string>
     <string name="title_activity_dmd">DMD</string>
     <string name="wifi_ip_unknown">unknown</string>
     <string name="wifi_needed">Need Wifi State permission to show IP address</string>

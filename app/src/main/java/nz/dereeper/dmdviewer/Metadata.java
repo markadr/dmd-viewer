@@ -27,10 +27,10 @@ package nz.dereeper.dmdviewer;
 
 public interface Metadata {
     /**
-     * Get the current {@link LedMatrix}
-     * @return the current {@link LedMatrix}
+     * Get the current {@link Dmd}
+     * @return the current {@link Dmd}
      */
-    LedMatrix getLedMatrix();
+    Dmd getDmd();
 
     /**
      * Get the current {@link Dimensions}

@@ -45,7 +45,7 @@ class ImageUtils {
         if (colours.length % 3 == 0) {
             final int width = metadata.getDimensions().width;
             final int height = metadata.getDimensions().height;
-            // Calculate this now rather than every time we want to set a pixel when LED enabled.
+            // Calculate this now rather than every time we want to set a pixel when DMD enabled.
             final int extraWidth = extraWidthCalc(metadata);
             final int[] rawImage = createRawImage(metadata);
             for (int y = 0; y < height; y++) {
@@ -72,7 +72,7 @@ class ImageUtils {
         if (planesAreValid(planes, bitLength, metadata.getDimensions())) {
             final int width = metadata.getDimensions().width;
             final int height = metadata.getDimensions().height;
-            // Calculate this now rather than every time we want to set a pixel when LED enabled.
+            // Calculate this now rather than every time we want to set a pixel when DMD enabled.
             final int extraWidth = extraWidthCalc(metadata);
             final int[] rawImage = createRawImage(metadata);
             final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
@@ -95,7 +95,7 @@ class ImageUtils {
         if (planesAreValid(planes, bitLength, metadata.getDimensions())) {
             final int width = metadata.getDimensions().width;
             final int height = metadata.getDimensions().height;
-            // Calculate this now rather than every time we want to set a pixel when LED enabled.
+            // Calculate this now rather than every time we want to set a pixel when DMD enabled.
             final int extraWidth = extraWidthCalc(metadata);
             final int[] rawImage = createRawImage(metadata);
             final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
@@ -123,11 +123,11 @@ class ImageUtils {
     }
 
     private static int[] createRawImage(final Metadata metadata) {
-        final LedMatrix ledMatrix = metadata.getLedMatrix();
+        final Dmd dmd = metadata.getDmd();
         final int width = metadata.getDimensions().width;
         final int height = metadata.getDimensions().height;
-        if (ledMatrix.enabled) {
-            return new int[(width * ledMatrix.ledWidth) * (height * ledMatrix.ledHeight)];
+        if (dmd.isEnabled()) {
+            return new int[(width * dmd.getCombined()) * (height * dmd.getCombined())];
         } else {
             return new int[width * height];
         }
@@ -141,7 +141,7 @@ class ImageUtils {
                                  final int extraWidth) {
         // Not much point in painting a black pixel
         if (colour != -1) {
-            if (metadata.getLedMatrix().enabled) {
+            if (metadata.getDmd().isEnabled()) {
                 drawLedMatrixPixels(x, y, colour, rawImage, metadata, extraWidth);
             } else {
                 // Calc the index into the array based on the X and Y values using the width to
@@ -159,20 +159,23 @@ class ImageUtils {
                                             final int[] rawImage,
                                             final Metadata metadata,
                                             final int extraWidth) {
-        final LedMatrix ledMatrix = metadata.getLedMatrix();
+        final Dmd dmd = metadata.getDmd();
         final Dimensions dimensions = metadata.getDimensions();
+        final boolean[][] pixelShape = dmd.getShape();
         // Based on ideas from https://github.com/sallar/led-matrix/blob/master/src/index.ts
         final int index = y * dimensions.width + x;
         final int dy = (int)Math.floor((float)index / (float)dimensions.width);
         final int dx = index - dy * dimensions.width;
-        final int newX = dx * ledMatrix.ledWidth;
-        final int newY = dy * ledMatrix.ledHeight;
-        // Draw the actual rect for this pixel
-        for (int i = 0; i < ledMatrix.pixelHeight; i++) {
-            for (int j = 0; j < ledMatrix.pixelWidth; j++) {
+        final int newX = dx * dmd.getCombined();
+        final int newY = dy * dmd.getCombined();
+        // Draw the actual shape for this pixel
+        for (int i = 0; i < dmd.getPixels(); i++) {
+            for (int j = 0; j < dmd.getPixels(); j++) {
                 // Calc the index into the array based on the new X and Y values, compensating for
-                // the additional width we need for the extra pixels in the LED matrix.
-                rawImage[(newY + i) * extraWidth + newX + j] = colour;
+                // the additional width we need for the extra pixels in the DMD.
+                if (pixelShape[i][j]) {
+                    rawImage[(newY + i) * extraWidth + newX + j] = colour;
+                }
             }
         }
     }
@@ -208,9 +211,9 @@ class ImageUtils {
     }
 
     private static int extraWidthCalc(final Metadata metadata) {
-        // If LED effect is enabled then the extra width needs to take this into account.
-        if (metadata.getLedMatrix().enabled) {
-            return metadata.getDimensions().width * metadata.getLedMatrix().ledWidth;
+        // If DMD effect is enabled then the extra width needs to take this into account.
+        if (metadata.getDmd().isEnabled()) {
+            return metadata.getDimensions().width * metadata.getDmd().getCombined();
         }
         return metadata.getDimensions().width;
     }

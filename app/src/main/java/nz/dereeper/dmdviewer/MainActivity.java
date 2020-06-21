@@ -59,7 +59,8 @@ import static java.lang.Integer.parseInt;
 public class MainActivity extends AppCompatActivity {
 
     static final String DMD_WS_PORT = "WS_PORT";
-    static final String DMD_LED_ENABLED = "LED_ENABLED";
+    static final String DMD_ENABLED = "DMD_ENABLED";
+    static final String DMD_ROUND_PIXEL = "PIXEL_ROUND";
 
     private final int PERMISSIONS_REQUEST_ACCESS_WIFI_STATE = 0;
     private final int PERMISSIONS_REQUEST_INTERNET = 1;
@@ -74,12 +75,16 @@ public class MainActivity extends AppCompatActivity {
     public void startDMDViewer(View view) {
         final TextView portText = findViewById(R.id.portInput);
         final int port = parseInt(portText.getText().toString());
-        final CheckBox enableLedEffect = findViewById(R.id.enableLedEffect);
-        final boolean enabled = enableLedEffect.isChecked();
+        final CheckBox enableDmdEffect = findViewById(R.id.enableDmdEffect);
+        final CheckBox enableDmdRound = findViewById(R.id.enableDmdRound);
+        final boolean enabled = enableDmdEffect.isChecked();
+        final boolean round = enableDmdRound.isChecked();
         final Intent intent = new Intent(this, DmdActivity.class);
         intent.putExtra(DMD_WS_PORT, port);
-        intent.putExtra(DMD_LED_ENABLED, enabled);
-        Timber.i("Opening DMD screen, passing port: %s enable LED effect: %s", port, enabled);
+        intent.putExtra(DMD_ENABLED, enabled);
+        intent.putExtra(DMD_ROUND_PIXEL, round);
+        Timber.i("Opening DMD screen, passing port: %s enable DMD effect: %s, round: %s",
+                port, enabled, round);
         startActivity(intent);
     }
 
