@@ -134,6 +134,15 @@ public class MainActivity extends AppCompatActivity {
             Button startButton = findViewById(R.id.startButton);
             startButton.setEnabled(false);
         }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override

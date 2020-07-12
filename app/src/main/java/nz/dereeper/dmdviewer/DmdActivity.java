@@ -178,6 +178,15 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
                       getIntent().getBooleanExtra(DMD_ROUND_PIXEL, false));
         Timber.i("DMD: %s", dmd);
         openingFrame = createOpeningFrame();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override
