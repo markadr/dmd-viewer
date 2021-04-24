@@ -1,5 +1,12 @@
 # Change log
 
+## v0.4
+Added preferences/settings screen to enable options to be set and saved between runs.
+Added auto start option to settings screen to support going straight into listening mode.
+Show opening screen again when client disconnects.
+Added a round-pixel option, not enabled by default.
+Added more on-screen controls to support going back when physical buttons are not accessible.
+
 ## v0.3
 Corrected a couple of UI gliches that caused the app to crash when moving off the DmdActivity screen.  
 Updated some build libraries.
