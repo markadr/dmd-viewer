@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2020 Mark de Reeper
+  ~ Copyright 2020-2021 Mark de Reeper
   ~
   ~  Permission is hereby granted, free of charge, to any person
   ~  obtaining a copy of this software and associated documentation
@@ -40,6 +40,24 @@
     <string name="wifi_ip_unknown">unknown</string>
     <string name="wifi_needed">Need Wifi State permission to show IP address</string>
     <string name="wifi_not_enabled">Wifi needs to be enabled to use DMD Viewer</string>
-    <string name="ws_url_text">WS URL</string>
+    <string name="ws_url_text">WebSocket URL</string>
     <string name="ws_url">ws://%s:%s/</string>
+    <string name="title_activity_settings">DMD Settings</string>
+    <string name="dmd_settings">DMD Viewer Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="main_header">DMD Viewer Settings</string>
+
+    <!-- Main Preferences -->
+    <string name="auto_start_title">Listen on app start</string>
+    <string name="auto_start_summary_on">Automatically start DMD viewer on load</string>
+    <string name="auto_start_summary_off">Don\'t automatically start DMD viewer on load</string>
+    <string name="dmd_effect_title">DMD Effect</string>
+    <string name="dmd_effect_summary_on">DMD effect enabled</string>
+    <string name="dmd_effect_summary_off">DMD effect disabled</string>
+    <string name="round_pixel_title">Round DMD Pixel</string>
+    <string name="round_pixel_summary_on">Round DMD pixel enabled</string>
+    <string name="round_pixel_summary_off">Round DMD pixel disabled</string>
+    <string name="port_title">WebSocket port</string>
+    <string name="port_summary">The port that the WebSocket will listen on</string>
 </resources>

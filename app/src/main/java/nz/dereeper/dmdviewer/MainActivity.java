@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Mark de Reeper
+ * Copyright 2020-2021 Mark de Reeper
  *
  *  Permission is hereby granted, free of charge, to any person
  *  obtaining a copy of this software and associated documentation
@@ -25,24 +25,23 @@
 
 package nz.dereeper.dmdviewer;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import timber.log.Timber;
@@ -73,12 +72,10 @@ public class MainActivity extends AppCompatActivity {
      * @param view The {@link View} that triggered this call.
      */
     public void startDMDViewer(View view) {
-        final TextView portText = findViewById(R.id.portInput);
-        final int port = parseInt(portText.getText().toString());
-        final CheckBox enableDmdEffect = findViewById(R.id.enableDmdEffect);
-        final CheckBox enableDmdRound = findViewById(R.id.enableDmdRound);
-        final boolean enabled = enableDmdEffect.isChecked();
-        final boolean round = enableDmdRound.isChecked();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final int port = parseInt(prefs.getString("websocket_port", "9090"));
+        final boolean enabled = prefs.getBoolean("dmd_effect", true);
+        final boolean round = prefs.getBoolean("round_pixel", false);
         final Intent intent = new Intent(this, DmdActivity.class);
         intent.putExtra(DMD_WS_PORT, port);
         intent.putExtra(DMD_ENABLED, enabled);
@@ -88,22 +85,29 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void showSettingsActivity() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        Timber.i("Opening Settings screen");
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.about_menu_item:
-                showAboutDialog();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.about_menu_item) {
+            showAboutDialog();
+            return true;
         }
+        if (item.getItemId() == R.id.settings_menu_item) {
+            showSettingsActivity();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -127,16 +131,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermissions();
-        final String ipValue = getWifiIp();
-        if (permissionsGrantedInternet && permissionsGrantedWifi && wifiEnabled) {
-            updateLabels(ipValue);
-        } else {
-            Button startButton = findViewById(R.id.startButton);
-            startButton.setEnabled(false);
+        updateLabels();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean autoStart = prefs.getBoolean("auto_start", false);
+        Timber.i("Auto start set to %s", autoStart);
+        if (autoStart) {
+            startDMDViewer(null);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        updateLabels();
+        super.onResume();
     }
 
     @Override
@@ -170,28 +181,18 @@ public class MainActivity extends AppCompatActivity {
         aboutWindow.show();
     }
 
-    private void updateLabels(String ipValue) {
-        final TextView ip = findViewById(R.id.ipAddress);
-        ip.setText(ipValue);
-        final TextView wsUrl = findViewById(R.id.wsUrl);
-        final TextView portText = findViewById(R.id.portInput);
-        wsUrl.setText(getString(R.string.ws_url, ip.getText(), portText.getText()));
-        portText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // ignore
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // ignore
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                wsUrl.setText(getString(R.string.ws_url, ip.getText(), s.toString()));
-            }
-        });
+    private void updateLabels() {
+        Timber.i("Updating labels");
+        final String ipValue = getWifiIp();
+        if (permissionsGrantedInternet && permissionsGrantedWifi && wifiEnabled) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String port = prefs.getString("websocket_port", "9090");
+            final TextView wsUrl = findViewById(R.id.wsUrl);
+            wsUrl.setText(getString(R.string.ws_url, ipValue, port));
+        } else {
+            Button startButton = findViewById(R.id.startButton);
+            startButton.setEnabled(false);
+        }
     }
 
     private void checkPermissions() {

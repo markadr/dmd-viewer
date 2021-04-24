@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2020 Mark de Reeper
+  ~ Copyright 2020-2021 Mark de Reeper
   ~
   ~  Permission is hereby granted, free of charge, to any person
   ~  obtaining a copy of this software and associated documentation
@@ -33,84 +33,16 @@
     tools:context=".MainActivity">
 
 
-    <TextView
-        android:id="@+id/ipLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:labelFor="@+id/ipAddress"
-        android:text="@string/dmd_ip"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/ipAddress"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="16dp"
-        android:duplicateParentState="false"
-        android:text="@string/wifi_ip_unknown"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/ipLabel"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/portLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="20dp"
-        android:labelFor="@+id/portInput"
-        android:text="@string/dmd_port"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ipLabel" />
-
-    <EditText
-        android:id="@+id/portInput"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="8dp"
-        android:autofillHints=""
-        android:ems="10"
-        android:hint="@string/dmd_port_hint"
-        android:inputType="numberDecimal"
-        android:text="@string/default_dmd_port"
-        android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@+id/portLabel"
-        app:layout_constraintTop_toBottomOf="@+id/ipAddress" />
-
     <Button
         android:id="@+id/startButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
         android:layout_marginTop="72dp"
         android:onClick="startDMDViewer"
         android:text="@string/connect_dmd"
-        app:layout_constraintStart_toEndOf="@+id/enableDmdEffect"
-        app:layout_constraintTop_toBottomOf="@+id/portInput" />
-
-    <CheckBox
-        android:id="@+id/enableDmdEffect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:checked="true"
-        android:text="@string/enable_dmd_effect"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/wsUrl"
@@ -118,10 +50,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
         android:layout_marginLeft="28dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="36dp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/portInput" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView2"
@@ -129,22 +61,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
         android:layout_marginLeft="36dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="36dp"
         android:text="@string/ws_url_text"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/portLabel" />
-
-    <CheckBox
-        android:id="@+id/enableDmdRound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/dmd_pixel_round"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/enableDmdEffect" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

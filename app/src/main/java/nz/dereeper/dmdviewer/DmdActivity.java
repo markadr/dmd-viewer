@@ -75,6 +75,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     private Dmd dmd;
     private Frame previousFrame;
     private Frame openingFrame;
+    private boolean closingDown;
 
     @Override
     public Dmd getDmd() {
@@ -93,6 +94,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
 
     @Override
     public void closeDown(final String errorMessage) {
+        closingDown = true;
         Timber.i("Closing DmdActivity...");
         stopServer();
         if (errorMessage != null) {
@@ -177,8 +179,9 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
                       getIntent().getBooleanExtra(DMD_ROUND_PIXEL, false));
         Timber.i("DMD: %s", dmd);
         openingFrame = createOpeningFrame();
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -199,6 +202,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     protected void onResume() {
         webSocketServer = new DmdWebSocketServer(this, getIntent().getIntExtra(DMD_WS_PORT, 9090));
         webSocketServer.start();
+        closingDown = false;
         super.onResume();
         // Hide elements of the UI since we are working in fullscreen mode
         ActionBar actionBar = getSupportActionBar();
@@ -240,6 +244,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     }
 
     private void stopServer() {
+        closingDown = true;
         if (webSocketServer != null) {
             try {
                 Timber.i("Stopping the WS Server");
@@ -338,7 +343,7 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     }
 
     private void showOpeningFrame() {
-        if (openingFrame != null) {
+        if (openingFrame != null && !closingDown) {
             // We know the dimensions of the opening frame, trigger the creation of the bitmap.
             setDimensions(new Dimensions(128, 32));
             renderFrame(openingFrame);
