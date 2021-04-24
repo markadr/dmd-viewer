@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Mark de Reeper
+ * Copyright 2020-2021 Mark de Reeper
  *
  *  Permission is hereby granted, free of charge, to any person
  *  obtaining a copy of this software and associated documentation
@@ -49,12 +49,13 @@ class ImageUtils {
             final int extraWidth = extraWidthCalc(metadata);
             final int[] rawImage = createRawImage(metadata);
             for (int y = 0; y < height; y++) {
+                int yWidth = y * width;
                 for (int x = 0; x < width; x++) {
-                    final int index = y * width + x;
+                    final int index = (yWidth + x) * 3;
                     // RGB24 is in BGR order
-                    final int b = (0xFF & colours[3 * index]);
-                    final int g = (0xFF & colours[3 * index + 1]);
-                    final int r = (0xFF & colours[3 * index + 2]);
+                    final int b = (0xFF & colours[index]);
+                    final int g = (0xFF & colours[index + 1]);
+                    final int r = (0xFF & colours[index + 2]);
                     setPixel(rawImage, x, y, Color.rgb(r, g, b), metadata, extraWidth);
                 }
             }
@@ -77,8 +78,9 @@ class ImageUtils {
             final int[] rawImage = createRawImage(metadata);
             final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
             for (int y = 0; y < height; y++) {
+                int yWidth = y * width;
                 for (int x = 0; x < width; x++) {
-                    setPixel(rawImage, x, y, palette[plane[y * width + x]], metadata, extraWidth);
+                    setPixel(rawImage, x, y, palette[plane[yWidth + x]], metadata, extraWidth);
                 }
             }
             return rawImage;
@@ -99,10 +101,13 @@ class ImageUtils {
             final int extraWidth = extraWidthCalc(metadata);
             final int[] rawImage = createRawImage(metadata);
             final byte[] plane = joinPlanes(planes, bitLength, metadata.getDimensions());
+            final float[] hsl = metadata.getHsl();
+            final float[] newHsl = new float[3];
+            newHsl[0] = hsl[0];
+            newHsl[1] = hsl[1];
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    final float[] newHsl = metadata.getHslCopy();
-                    newHsl[2] = newHsl[2] * (plane[y * width + x] / numberOfColours); // Lum value
+                    newHsl[2] = hsl[2] * (plane[y * width + x] / numberOfColours); // Lum value
                     setPixel(rawImage, x, y, HSLToColor(newHsl), metadata, extraWidth);
                 }
             }
@@ -140,7 +145,7 @@ class ImageUtils {
                                  final Metadata metadata,
                                  final int extraWidth) {
         // Not much point in painting a black pixel
-        if (colour != -1) {
+        if (colour != Color.BLACK) {
             if (metadata.getDmd().isEnabled()) {
                 drawLedMatrixPixels(x, y, colour, rawImage, metadata, extraWidth);
             } else {
@@ -164,17 +169,18 @@ class ImageUtils {
         final boolean[][] pixelShape = dmd.getShape();
         // Based on ideas from https://github.com/sallar/led-matrix/blob/master/src/index.ts
         final int index = y * dimensions.width + x;
-        final int dy = (int)Math.floor((float)index / (float)dimensions.width);
+        final int dy = index / dimensions.width;
         final int dx = index - dy * dimensions.width;
         final int newX = dx * dmd.getCombined();
         final int newY = dy * dmd.getCombined();
         // Draw the actual shape for this pixel
         for (int i = 0; i < dmd.getPixels(); i++) {
+            int newI = (newY + i) * extraWidth + newX;
             for (int j = 0; j < dmd.getPixels(); j++) {
                 // Calc the index into the array based on the new X and Y values, compensating for
                 // the additional width we need for the extra pixels in the DMD.
                 if (pixelShape[i][j]) {
-                    rawImage[(newY + i) * extraWidth + newX + j] = colour;
+                    rawImage[newI + j] = colour;
                 }
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Mark de Reeper
+ * Copyright 2020-2021 Mark de Reeper
  *
  *  Permission is hereby granted, free of charge, to any person
  *  obtaining a copy of this software and associated documentation
@@ -39,8 +39,8 @@ public interface Metadata {
     Dimensions getDimensions();
 
     /**
-     * Get a copy of the current colour in hue, saturation, lightness (HSL) form.
+     * Get the current colour in hue, saturation, lightness (HSL) form.
      * @return A 3 element float array representing the HSL of the current colour.
      */
-    float[] getHslCopy();
+    float[] getHsl();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Mark de Reeper
+ * Copyright 2020-2021 Mark de Reeper
  *
  *  Permission is hereby granted, free of charge, to any person
  *  obtaining a copy of this software and associated documentation
@@ -69,9 +69,11 @@ class Frame {
         }
 
         public static FrameType getEnum(final String type) {
-            for (FrameType frameType : FrameType.values()) {
-                if (frameType.type.equals(type)) {
-                    return frameType;
+            if (!type.isEmpty()) {
+                for (FrameType frameType : FrameType.values()) {
+                    if (frameType.type.equals(type)) {
+                        return frameType;
+                    }
                 }
             }
             Timber.w("Unknown frame type: %s", type);
@@ -176,26 +178,30 @@ class Frame {
     }
 
     private String stringFromData(final ByteBuffer data, final boolean skip) {
-        int start = data.position();
-        byte b = data.get();
-        if (skip) {
-            // skip over any null bytes at the beginning of the data.
-            while (b == 0) {
-                b = data.get();
-                start++;
+        if (data.hasRemaining()) {
+            int start = data.position();
+            byte b = data.get();
+            if (skip) {
+                // skip over any null bytes at the beginning of the data.
+                while (b == 0) {
+                    b = data.get();
+                    start++;
+                }
             }
-        }
-        int length = 0;
-        // Look through the data until we find a null (0) byte or we hit the end of the data
-        while (b != 0) {
-            length++;
-            if (data.hasRemaining()) {
-                b = data.get();
-            } else {
-                break;
+            int length = 0;
+            // Look through the data until we find a null (0) byte or we hit the end of the data
+            while (b != 0) {
+                length++;
+                if (data.hasRemaining()) {
+                    b = data.get();
+                } else {
+                    break;
+                }
             }
+            return new String(data.array(), start, length);
         }
-        return new String(data.array(), start, length);
+        Timber.w("The null terminated String contained no bytes");
+        return "";
     }
 
     private int[] paletteFromData(final ByteBuffer data) {

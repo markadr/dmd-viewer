@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Mark de Reeper
+ * Copyright 2020-2021 Mark de Reeper
  *
  *  Permission is hereby granted, free of charge, to any person
  *  obtaining a copy of this software and associated documentation
@@ -87,9 +87,8 @@ public class DmdActivity extends AppCompatActivity implements Processing, Metada
     }
 
     @Override
-    public float[] getHslCopy() {
-        // Provide a copy as the value gets updated before being used to generate a pixel colour.
-        return hsl.clone();
+    public float[] getHsl() {
+        return hsl;
     }
 
     @Override
